@@ -73,7 +73,7 @@ fn entry() -> Result<(), ()> {
             let mut uppercase = true;
             let mut lowercase = true;
             let mut digits = true;
-            let mut special_chars = true;
+            let mut special = true;
 
             while let Some(arg) = args.next() {
                 match arg.as_str() {
@@ -85,7 +85,7 @@ fn entry() -> Result<(), ()> {
                     "-U" | "--no-uppercase" => uppercase = false,
                     "-L" | "--no-lowercase" => lowercase = false,
                     "-D" | "--no-digits" => digits = false,
-                    "-S" | "--no-special" => special_chars = false,
+                    "-S" | "--no-special" => special = false,
                     "-h" | "--help" => {
                         usage_generate(&program);
                         return Ok(());
@@ -98,7 +98,7 @@ fn entry() -> Result<(), ()> {
                 }
             }
 
-            if !uppercase && !lowercase && !digits && !special_chars {
+            if !uppercase && !lowercase && !digits && !special {
                 eprintln!("ERROR: password generator must include at least one character set");
                 return Err(());
             }
@@ -108,11 +108,11 @@ fn entry() -> Result<(), ()> {
                 .include_uppercase(uppercase)
                 .include_lowercase(lowercase)
                 .include_digits(digits)
-                .include_special_chars(special_chars)
+                .include_special(special)
                 .min_uppercase(min_uppercase)
                 .min_lowercase(min_lowercase)
                 .min_digits(min_digits)
-                .min_special_chars(min_special)
+                .min_special(min_special)
                 .build();
 
             let pw = pg.generate_password();

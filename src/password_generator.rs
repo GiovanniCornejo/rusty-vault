@@ -5,7 +5,7 @@ const DEFAULT_LENGTH: std::ops::Range<usize> = 12..17;
 const UPPERCASE: &str = "ABCDEFGHIJKLMNOPQRSTUVWXZ";
 const LOWERCASE: &str = "abcdefghijklmnopqrstuvwxyz";
 const DIGITS: &str = "1234567890";
-const SPECIAL_CHARS: &str = "!@#$%^&*()";
+const SPECIAL: &str = "!@#$%^&*()";
 
 pub struct PasswordGenerator {
     length: usize,
@@ -13,7 +13,7 @@ pub struct PasswordGenerator {
     min_uppercase: usize,
     min_lowercase: usize,
     min_digits: usize,
-    min_special_chars: usize,
+    min_special: usize,
 }
 
 impl PasswordGenerator {
@@ -22,11 +22,11 @@ impl PasswordGenerator {
         uppercase: bool,
         lowercase: bool,
         digits: bool,
-        special_chars: bool,
+        special: bool,
         min_uppercase: usize,
         min_lowercase: usize,
         min_digits: usize,
-        min_special_chars: usize,
+        min_special: usize,
     ) -> Self {
         let mut char_set = String::new();
         if uppercase {
@@ -38,8 +38,8 @@ impl PasswordGenerator {
         if digits {
             char_set += DIGITS;
         }
-        if special_chars {
-            char_set += SPECIAL_CHARS;
+        if special {
+            char_set += SPECIAL;
         }
 
         Self {
@@ -48,18 +48,17 @@ impl PasswordGenerator {
             min_uppercase,
             min_lowercase,
             min_digits,
-            min_special_chars,
+            min_special,
         }
     }
 
     pub fn generate_password(&self) -> String {
         let mut pw = String::new();
         let mut rng = thread_rng();
-        let len = self.char_set.len();
 
         // Generate a random character in the char_set and add to password
         for _ in 0..self.length {
-            pw.push(self.char_set[rng.gen_range(0..len)]);
+            pw.push(self.char_set[rng.gen_range(0..self.char_set.len())]);
         }
         pw
     }
@@ -70,11 +69,11 @@ pub struct PasswordGeneratorBuilder {
     uppercase: bool,
     lowercase: bool,
     digits: bool,
-    special_chars: bool,
+    special: bool,
     min_uppercase: usize,
     min_lowercase: usize,
     min_digits: usize,
-    min_special_chars: usize,
+    min_special: usize,
 }
 
 impl PasswordGeneratorBuilder {
@@ -84,11 +83,11 @@ impl PasswordGeneratorBuilder {
             uppercase: true,
             lowercase: true,
             digits: true,
-            special_chars: true,
+            special: true,
             min_uppercase: 1,
             min_lowercase: 1,
             min_digits: 1,
-            min_special_chars: 1,
+            min_special: 1,
         }
     }
 
@@ -97,23 +96,23 @@ impl PasswordGeneratorBuilder {
         self
     }
 
-    pub fn include_uppercase(mut self, include: bool) -> Self {
-        self.uppercase = include;
+    pub fn include_uppercase(mut self, uppercase: bool) -> Self {
+        self.uppercase = uppercase;
         self
     }
 
-    pub fn include_lowercase(mut self, include: bool) -> Self {
-        self.lowercase = include;
+    pub fn include_lowercase(mut self, lowercase: bool) -> Self {
+        self.lowercase = lowercase;
         self
     }
 
-    pub fn include_digits(mut self, include: bool) -> Self {
-        self.digits = include;
+    pub fn include_digits(mut self, digits: bool) -> Self {
+        self.digits = digits;
         self
     }
 
-    pub fn include_special_chars(mut self, include: bool) -> Self {
-        self.special_chars = include;
+    pub fn include_special(mut self, special: bool) -> Self {
+        self.special = special;
         self
     }
 
@@ -132,8 +131,8 @@ impl PasswordGeneratorBuilder {
         self
     }
 
-    pub fn min_special_chars(mut self, count: usize) -> Self {
-        self.min_special_chars = count;
+    pub fn min_special(mut self, count: usize) -> Self {
+        self.min_special = count;
         self
     }
 
@@ -143,11 +142,11 @@ impl PasswordGeneratorBuilder {
             self.uppercase,
             self.lowercase,
             self.digits,
-            self.special_chars,
+            self.special,
             self.min_uppercase,
             self.min_lowercase,
             self.min_digits,
-            self.min_special_chars,
+            self.min_special,
         )
     }
 }
