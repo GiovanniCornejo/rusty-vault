@@ -20,19 +20,34 @@ fn usage_generate(program: &str) {
     eprintln!("Generate a password");
     eprintln!("\nOptions:");
     eprintln!(
-        "  -l, --length <LENGTH>                length of the generated password (default: 12-16)"
+        "  -n, --length <LENGTH>                length of the generated password (default: 12-16)"
     );
     eprintln!("  -u, --min-upper <COUNT>              minimum uppercase letters (default: 1)");
-    eprintln!("  -w, --min-lower <COUNT>              minimum lowercase letters (default: 1)");
+    eprintln!("  -l, --min-lower <COUNT>              minimum lowercase letters (default: 1)");
     eprintln!("  -d, --min-digits <COUNT>             minimum digits (default: 1)");
-    eprintln!("  -s, --min-special <COUNT>            minimum special chracters (default: 1)");
+    eprintln!("  -s, --min-special <COUNT>            minimum special characters (default: 1)");
     eprintln!("");
     eprintln!("Exclusion Options:");
     eprintln!("  -U, --no-uppercase                   exclude uppercase letters");
     eprintln!("  -L, --no-lowercase                   exclude lowercase letters");
     eprintln!("  -D, --no-digits                      exclude digits");
-    eprintln!("  -S, --no-special-chars               exclude special characters");
+    eprintln!("  -S, --no-special                     exclude special characters");
     eprintln!("\n  -h, --help                           show this help message and exit");
+}
+
+fn parse_count(arg: Option<String>, arg_type: &str) -> Result<usize, ()> {
+    if let Some(arg) = arg {
+        match arg.parse::<usize>() {
+            Ok(count) => Ok(count),
+            Err(_) => {
+                eprintln!("ERROR: invalid {arg_type} count: {arg}");
+                return Err(());
+            }
+        }
+    } else {
+        eprintln!("ERROR: no {arg_type} argument provided");
+        return Err(());
+    }
 }
 
 fn entry() -> Result<(), ()> {
@@ -48,7 +63,13 @@ fn entry() -> Result<(), ()> {
 
     match subcommand.as_str() {
         "generate" => {
+            // Default settings
             let mut pw_length: Option<usize> = None;
+            let mut min_uppercase = 1;
+            let mut min_lowercase = 1;
+            let mut min_digits = 1;
+            let mut min_special = 1;
+
             let mut uppercase = true;
             let mut lowercase = true;
             let mut digits = true;
@@ -56,32 +77,15 @@ fn entry() -> Result<(), ()> {
 
             while let Some(arg) = args.next() {
                 match arg.as_str() {
-                    "-l" | "--length" => {
-                        if let Some(arg) = args.next() {
-                            match arg.parse::<usize>() {
-                                Ok(len) => pw_length = Some(len),
-                                Err(_) => {
-                                    eprintln!("ERROR: invalid length argument {arg}");
-                                    return Err(());
-                                }
-                            }
-                        } else {
-                            eprintln!("ERROR: no length argument provided");
-                            return Err(());
-                        }
-                    }
-                    "-U" | "--no-uppercase" => {
-                        uppercase = false;
-                    }
-                    "-L" | "--no-lowercase" => {
-                        lowercase = false;
-                    }
-                    "-d" | "--no-digits" => {
-                        digits = false;
-                    }
-                    "-s" | "--no-special-chars" => {
-                        special_chars = false;
-                    }
+                    "-n" | "--length" => pw_length = Some(parse_count(args.next(), "length")?),
+                    "-u" | "--min-upper" => min_uppercase = parse_count(args.next(), "uppercase")?,
+                    "-l" | "--min-lower" => min_lowercase = parse_count(args.next(), "lowercase")?,
+                    "-d" | "--min-digits" => min_digits = parse_count(args.next(), "digits")?,
+                    "-s" | "--min-special" => min_special = parse_count(args.next(), "special")?,
+                    "-U" | "--no-uppercase" => uppercase = false,
+                    "-L" | "--no-lowercase" => lowercase = false,
+                    "-D" | "--no-digits" => digits = false,
+                    "-S" | "--no-special" => special_chars = false,
                     "-h" | "--help" => {
                         usage_generate(&program);
                         return Ok(());
@@ -99,7 +103,18 @@ fn entry() -> Result<(), ()> {
                 return Err(());
             }
 
-            let pg = PasswordGenerator::new(pw_length, uppercase, lowercase, digits, special_chars);
+            let pg = PasswordGeneratorBuilder::new()
+                .length(pw_length)
+                .include_uppercase(uppercase)
+                .include_lowercase(lowercase)
+                .include_digits(digits)
+                .include_special_chars(special_chars)
+                .min_uppercase(min_uppercase)
+                .min_lowercase(min_lowercase)
+                .min_digits(min_digits)
+                .min_special_chars(min_special)
+                .build();
+
             let pw = pg.generate_password();
             println!("Generated password: {pw}");
 
