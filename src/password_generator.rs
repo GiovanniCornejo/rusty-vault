@@ -94,7 +94,7 @@ impl PasswordGenerator {
     }
 
     /// Calculates password strength based on unique character pool size and password length
-    pub fn validate_password(pw: &str, common_passwords: &Vec<String>) -> i32 {
+    pub fn validate_password(pw: &str, common_passwords: &[String]) -> i32 {
         // Check if is a common password
         if common_passwords.contains(&pw.to_string()) {
             return -3;

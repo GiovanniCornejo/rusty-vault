@@ -121,7 +121,7 @@ fn entry() -> Result<(), ()> {
                     return Ok(());
                 }
             };
-            while let Some(arg) = args.next() {
+            for arg in args {
                 pw += &arg;
             }
 
