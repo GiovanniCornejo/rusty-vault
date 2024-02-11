@@ -1,0 +1,26 @@
+name: CI
+on: [push, pull_request]
+
+jobs:
+  build_and_test:
+    name: rusty-vault
+    runs-on: ubuntu-latest
+    steps:
+      # Check compiles
+      - uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release --all-features
+      # Check tests
+      - uses: actions-rs/cargo@v1
+        with:
+          command: test
+      # Check clippy remarks
+      - uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+      # Check formatting
+      - uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: -- --check
