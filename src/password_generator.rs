@@ -1,25 +1,22 @@
-use std::fs::File;
-use std::io::{BufRead, BufReader};
-
+use lazy_static::lazy_static;
 use rand::{seq::SliceRandom, thread_rng, Rng};
 
-pub const DEFAULT_MIN: usize = 13;
-const DEFAULT_MAX: usize = 16;
+pub const ALLOWED_MIN: usize = 13;
+pub const DEFAULT_MIN: usize = 20;
+pub const DEFAULT_MAX: usize = 25;
 
 const UPPERCASE: &str = "ABCDEFGHIJKLMNOPQRSTUVWXZ";
 const LOWERCASE: &str = "abcdefghijklmnopqrstuvwxyz";
 const DIGITS: &str = "1234567890";
 const SPECIAL: &str = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ ";
 
-pub fn get_common_passwords() -> Vec<String> {
-    let file = File::open("data/10000-most-common-passwords.txt")
-        .expect("file not found: data/10000-most-common-passwords.txt");
-    let reader = BufReader::new(file);
-
-    reader
-        .lines()
-        .map(|line| line.expect("Failed to read line"))
-        .collect()
+// Store most common passwords directly into executable
+lazy_static! {
+    static ref COMMON_PASSWORDS: Vec<&'static str> = {
+        include_str!(r"../data/10000-most-common-passwords.txt")
+            .split_terminator('\n')
+            .collect()
+    };
 }
 
 pub struct PasswordGenerator {
@@ -38,12 +35,12 @@ impl PasswordGenerator {
     ) -> Result<Self, ()> {
         let length = length.unwrap_or(
             if DEFAULT_MIN > min_uppercase + min_lowercase + min_digits + min_special {
-                thread_rng().gen_range(DEFAULT_MIN..DEFAULT_MAX)
+                thread_rng().gen_range(DEFAULT_MIN..DEFAULT_MAX + 1)
             } else {
                 min_uppercase + min_lowercase + min_digits + min_special
             },
         );
-        if length < DEFAULT_MIN || length < min_uppercase + min_lowercase + min_digits + min_special
+        if length < ALLOWED_MIN || length < min_uppercase + min_lowercase + min_digits + min_special
         {
             eprintln!("ERROR: length of password not long enough");
             return Err(());
@@ -94,9 +91,9 @@ impl PasswordGenerator {
     }
 
     /// Calculates password strength based on unique character pool size and password length
-    pub fn validate_password(pw: &str, common_passwords: &[String]) -> i32 {
+    pub fn validate_password(pw: &str, check_common: bool) -> i32 {
         // Check if is a common password
-        if common_passwords.contains(&pw.to_string()) {
+        if check_common && COMMON_PASSWORDS.contains(&pw) {
             return -3;
         }
 
@@ -197,11 +194,11 @@ mod tests {
     #[test]
     fn test_good_length() {
         let generator = PasswordGeneratorBuilder::new()
-            .length(Some(10))
+            .length(Some(14))
             .build()
             .unwrap();
         let password = generator.generate_password();
-        assert_eq!(password.len(), 10);
+        assert_eq!(password.len(), 14);
     }
 
     #[test]

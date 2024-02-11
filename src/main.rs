@@ -21,7 +21,7 @@ fn usage_generate(program: &str) {
     eprintln!("Generate a password");
     eprintln!("\nOptions:");
     eprintln!(
-        "  -n, --length <LENGTH>                length of the generated password (default: 12-16)"
+        "  -n, --length <LENGTH>                length of the generated password (default: {DEFAULT_MIN}-{DEFAULT_MAX}, minimum: {ALLOWED_MIN})"
     );
     eprintln!("  -u, --min-upper <COUNT>              minimum uppercase letters (default: 1)");
     eprintln!("  -l, --min-lower <COUNT>              minimum lowercase letters (default: 1)");
@@ -43,8 +43,8 @@ fn parse_count(arg: Option<String>, arg_type: &str) -> Result<usize, ()> {
     if let Some(arg) = arg {
         match arg.parse::<usize>() {
             Ok(count) => {
-                if arg_type == "length" && count < DEFAULT_MIN {
-                    eprintln!("ERROR: length must be at least {DEFAULT_MIN}");
+                if arg_type == "length" && count < ALLOWED_MIN {
+                    eprintln!("ERROR: length must be at least {ALLOWED_MIN}");
                     return Err(());
                 } else if count < 1 {
                     eprintln!("ERROR: minimum count for {arg_type} must be at least 1");
@@ -125,7 +125,7 @@ fn entry() -> Result<(), ()> {
                 pw += &arg;
             }
 
-            match PasswordGenerator::validate_password(&pw, &get_common_passwords()) {
+            match PasswordGenerator::validate_password(&pw, true) {
                 2 => println!("Password strength: VERY STRONG"),
                 1 => println!("Password strength: STRONG"),
                 0 => println!("Password strength: MEDIUM"),
