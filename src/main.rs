@@ -26,12 +26,6 @@ fn usage_generate(program: &str) {
     eprintln!("  -l, --min-lower <COUNT>              minimum lowercase letters (default: 1)");
     eprintln!("  -d, --min-digits <COUNT>             minimum digits (default: 1)");
     eprintln!("  -s, --min-special <COUNT>            minimum special characters (default: 1)");
-    eprintln!("");
-    eprintln!("Exclusion Options:");
-    eprintln!("  -U, --no-uppercase                   exclude uppercase letters");
-    eprintln!("  -L, --no-lowercase                   exclude lowercase letters");
-    eprintln!("  -D, --no-digits                      exclude digits");
-    eprintln!("  -S, --no-special                     exclude special characters");
     eprintln!("\n  -h, --help                           show this help message and exit");
 }
 
@@ -70,11 +64,6 @@ fn entry() -> Result<(), ()> {
             let mut min_digits = 1;
             let mut min_special = 1;
 
-            let mut uppercase = true;
-            let mut lowercase = true;
-            let mut digits = true;
-            let mut special = true;
-
             while let Some(arg) = args.next() {
                 match arg.as_str() {
                     "-n" | "--length" => pw_length = Some(parse_count(args.next(), "length")?),
@@ -82,10 +71,6 @@ fn entry() -> Result<(), ()> {
                     "-l" | "--min-lower" => min_lowercase = parse_count(args.next(), "lowercase")?,
                     "-d" | "--min-digits" => min_digits = parse_count(args.next(), "digits")?,
                     "-s" | "--min-special" => min_special = parse_count(args.next(), "special")?,
-                    "-U" | "--no-uppercase" => uppercase = false,
-                    "-L" | "--no-lowercase" => lowercase = false,
-                    "-D" | "--no-digits" => digits = false,
-                    "-S" | "--no-special" => special = false,
                     "-h" | "--help" => {
                         usage_generate(&program);
                         return Ok(());
@@ -98,22 +83,13 @@ fn entry() -> Result<(), ()> {
                 }
             }
 
-            if !uppercase && !lowercase && !digits && !special {
-                eprintln!("ERROR: password generator must include at least one character set");
-                return Err(());
-            }
-
             let pg = PasswordGeneratorBuilder::new()
                 .length(pw_length)
-                .include_uppercase(uppercase)
-                .include_lowercase(lowercase)
-                .include_digits(digits)
-                .include_special(special)
                 .min_uppercase(min_uppercase)
                 .min_lowercase(min_lowercase)
                 .min_digits(min_digits)
                 .min_special(min_special)
-                .build();
+                .build()?;
 
             let pw = pg.generate_password();
             println!("Generated password: {pw}");

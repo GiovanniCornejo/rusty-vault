@@ -10,46 +10,38 @@ const SPECIAL: &str = "!@#$%^&*()";
 pub struct PasswordGenerator {
     length: usize,
     char_sets: Vec<Vec<char>>,
-    min_uppercase: usize,
-    min_lowercase: usize,
-    min_digits: usize,
-    min_special: usize,
+    min_counts: [usize; 4],
 }
 
 impl PasswordGenerator {
     pub fn new(
         length: usize,
-        uppercase: bool,
-        lowercase: bool,
-        digits: bool,
-        special: bool,
         min_uppercase: usize,
         min_lowercase: usize,
         min_digits: usize,
         min_special: usize,
-    ) -> Self {
-        let mut char_sets = Vec::new();
-        if uppercase {
-            char_sets.push(UPPERCASE.chars().collect());
-        }
-        if lowercase {
-            char_sets.push(LOWERCASE.chars().collect());
-        }
-        if digits {
-            char_sets.push(DIGITS.chars().collect());
-        }
-        if special {
-            char_sets.push(SPECIAL.chars().collect());
+    ) -> Result<Self, ()> {
+        if length < min_uppercase + min_lowercase + min_digits + min_special {
+            eprintln!(
+                "ERROR: length of password cannot be lower than minimum requirements: {}",
+                min_uppercase + min_lowercase + min_digits + min_special
+            );
+            return Err(());
         }
 
-        Self {
+        let mut char_sets = Vec::new();
+        char_sets.push(UPPERCASE.chars().collect());
+        char_sets.push(LOWERCASE.chars().collect());
+        char_sets.push(DIGITS.chars().collect());
+        char_sets.push(SPECIAL.chars().collect());
+
+        let min_counts = [min_uppercase, min_lowercase, min_digits, min_special];
+
+        Ok(Self {
             length,
             char_sets,
-            min_uppercase,
-            min_lowercase,
-            min_digits,
-            min_special,
-        }
+            min_counts,
+        })
     }
 
     pub fn generate_password(&self) -> String {
@@ -58,16 +50,10 @@ impl PasswordGenerator {
 
         // Keep track of minimum requirements
         let mut remaining_length = self.length;
-        let required_counts = [
-            self.min_uppercase,
-            self.min_lowercase,
-            self.min_digits,
-            self.min_special,
-        ];
 
         // Generate characters for each set until minimum requirements are met
         for (i, char_set) in self.char_sets.iter().enumerate() {
-            let required_count = required_counts[i].min(remaining_length);
+            let required_count = self.min_counts[i].min(remaining_length);
             for _ in 0..required_count {
                 pw.push(char_set[rng.gen_range(0..char_set.len())]);
                 remaining_length -= 1;
@@ -89,10 +75,6 @@ impl PasswordGenerator {
 
 pub struct PasswordGeneratorBuilder {
     length: usize,
-    uppercase: bool,
-    lowercase: bool,
-    digits: bool,
-    special: bool,
     min_uppercase: usize,
     min_lowercase: usize,
     min_digits: usize,
@@ -103,10 +85,7 @@ impl PasswordGeneratorBuilder {
     pub fn new() -> Self {
         Self {
             length: 0,
-            uppercase: true,
-            lowercase: true,
-            digits: true,
-            special: true,
+
             min_uppercase: 1,
             min_lowercase: 1,
             min_digits: 1,
@@ -116,26 +95,6 @@ impl PasswordGeneratorBuilder {
 
     pub fn length(mut self, length: Option<usize>) -> Self {
         self.length = length.unwrap_or(thread_rng().gen_range(DEFAULT_LENGTH));
-        self
-    }
-
-    pub fn include_uppercase(mut self, uppercase: bool) -> Self {
-        self.uppercase = uppercase;
-        self
-    }
-
-    pub fn include_lowercase(mut self, lowercase: bool) -> Self {
-        self.lowercase = lowercase;
-        self
-    }
-
-    pub fn include_digits(mut self, digits: bool) -> Self {
-        self.digits = digits;
-        self
-    }
-
-    pub fn include_special(mut self, special: bool) -> Self {
-        self.special = special;
         self
     }
 
@@ -159,13 +118,9 @@ impl PasswordGeneratorBuilder {
         self
     }
 
-    pub fn build(self) -> PasswordGenerator {
+    pub fn build(self) -> Result<PasswordGenerator, ()> {
         PasswordGenerator::new(
             self.length,
-            self.uppercase,
-            self.lowercase,
-            self.digits,
-            self.special,
             self.min_uppercase,
             self.min_lowercase,
             self.min_digits,
