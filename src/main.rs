@@ -7,7 +7,8 @@ use password_generator::*;
 fn usage(program: &str) {
     eprintln!("Usage: {program} <SUBCOMMAND> [OPTIONS]");
     eprintln!("\nSubcommands");
-    eprintln!("  generate                             generate a password ");
+    eprintln!("  generate                             generate a password");
+    eprintln!("  create                               create your own password");
     // Add more subcommands as needed
 
     eprintln!(
@@ -26,6 +27,12 @@ fn usage_generate(program: &str) {
     eprintln!("  -l, --min-lower <COUNT>              minimum lowercase letters (default: 1)");
     eprintln!("  -d, --min-digits <COUNT>             minimum digits (default: 1)");
     eprintln!("  -s, --min-special <COUNT>            minimum special characters (default: 1)");
+    eprintln!("\n  -h, --help                           show this help message and exit");
+}
+
+fn usage_check(program: &str) {
+    eprintln!("Usage: {program} check <PASSWORD>");
+    eprintln!("Check strength of a custom password");
     eprintln!("\n  -h, --help                           show this help message and exit");
 }
 
@@ -54,7 +61,7 @@ fn parse_count(arg: Option<String>, arg_type: &str) -> Result<usize, ()> {
 }
 
 fn entry() -> Result<(), ()> {
-    let mut args = env::args();
+    let mut args = env::args().peekable();
     let program = args.next().expect("path to program is provided");
     let subcommand = match args.next() {
         Some(subcommand) => subcommand,
@@ -102,15 +109,30 @@ fn entry() -> Result<(), ()> {
 
             let pw = pg.generate_password();
             println!("Generated password: {pw}");
-
-            Ok(())
+        }
+        "check" => {
+            if args.peek().is_none() {
+                usage_check(&program);
+                return Ok(());
+            }
+            // while let Some(arg) = args.next() {
+            //     match arg.as_str() {
+            //         _ => {
+            //             usage_check(&program);
+            //             eprintln!("ERROR: unknown argument {arg}");
+            //             return Err(());
+            //         }
+            //     }
+            // }
         }
         _ => {
             usage_generate(&program);
             eprintln!("ERROR: unknown subcommand {}", subcommand);
-            Err(())
+            return Err(());
         }
     }
+
+    Ok(())
 }
 
 fn main() -> ExitCode {
