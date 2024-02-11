@@ -1,46 +1,65 @@
 # RustyVault
 
-A secure command-line password manager implemented in Rust.
+RustyVault is a secure command-line password manager implemented in Rust. It provides users with the ability to generate strong, random passwords and securely store and retrieve password entries.
 
-## Project Roadmap
+## Project Overview
 
-This section provides an overview of planned features, ongoing tasks, and future enhancements for the project.
+This project is divided into two main modules: password generation and password management.
 
-### Current Tasks
+### Password Generation Module
+
+The password generation module focuses on generating strong, random passwords according to user-defined criteria. This module ensures that users can create secure passwords for their accounts with ease.
+
+#### Current Tasks
 
 - [x] Set up project repository
+- [ ] Implement password generation mechanism
+- [ ] Write tests for password generation logic
+- [ ] Design user interface for specifying password generation options
+- [ ] Develop command-line interface (CLI) interaction for password generation
+- [ ] Test and validate password generation functionality
+- [ ] Document password generation usage and options
+
+#### Planned Features
+
+- [ ] Add configuration file for customization of default password generation options
+- [ ] Implement password strength analysis for user-created passwords
+- [ ] Enhance password generation algorithm for improved randomness and security
+
+### Password Management Module
+
+The password management module focuses on securely storing and managing password entries. This module ensures that users can access their passwords whenever they need them while keeping them protected from unauthorized access.
+
+#### Current Tasks
+
 - [x] Design data model for password entries
 - [ ] Choose encryption mechanism
-- [ ] Implement command-line interface (CLI)
-- [ ] Develop password encryption and storage functionality
-- [ ] Write tests for encryption and decryption
-- [ ] Implement error handling and input validation
+- [ ] Implement password encryption and storage functionality
+- [ ] Develop command-line interface (CLI) interaction for password management
+- [ ] Test and validate password storage and retrieval functionality
+- [ ] Document password management usage and options
 
-### Planned Features
+#### Planned Features
 
-- [ ] Add password generation functionality
-- [ ] Implement password strength analysis
-- [ ] Integrate with external password managers (e.g., LastPass, Bitwarden)
-- [ ] Enhance usability with interactive prompts and user-friendly messaging
+- [ ] Add support for storing additional metadata (e.g., website URLs, account names)
+- [ ] Implement import and export functionality for password data
+- [ ] Explore options for secure password sharing between trusted users
 
 ### Future Enhancements
 
-- [ ] Implement support for storing additional metadata (e.g., website URLs, account names)
-- [ ] Add support for importing and exporting password data
-- [ ] Implement secure password sharing between trusted users
-- [ ] Explore options for multi-device synchronization and backup
-- [ ] Browser extension(s) to integrate with the program for automation
+- [ ] Integrate password generation module with password management for automatic password generation
+- [ ] Implement support for multi-device synchronization and backup
+- [ ] Develop browser extension(s) to automate password insertion into web forms
+- [ ] Enhance usability with interactive prompts and user-friendly messaging
 
 ## Goal
 
-### Motivation
+RustyVault is a project aimed at expanding my skills in Rust programming and exploring best practices in encryption and decryption. While the primary goal is to create a secure command-line password manager, the project also serves as a learning opportunity for me to deepen my understanding of Rust and cryptography.
 
-RustyVault is a project aimed at expanding my skills in Rust programming and exploring best practices in software development. While the primary goal is to create a secure command-line password manager, the project also serves as a learning opportunity for me to deepen my understanding of Rust and cryptography.
+## Contributing
 
-### Contributing Code
+Contributions to RustyVault are currently not accepted as this project is primarily for educational purposes. However, feel free to fork the repository and experiment with the code for your own use. The contribution policy may change in the future as the project grows in scope.
 
-At this time, no contributions are being accepted for RustyVault. The project is primarily for educational purposes, and I am focusing on developing and refining the codebase independently. The contribution policy may change in the future as the project evolves.
+## License
 
-### Educational Purposes
-
-Please note that RustyVault is primarily a learning project and may not be suitable for production use. While every effort is made to ensure the security and reliability of the code, it's important to exercise caution when handling sensitive information. By contributing to this project, you acknowledge that your participation is for educational purposes and that the project is provided "as is" without warranty of any kind.
+This project is licensed under the [MIT License](LICENSE).
