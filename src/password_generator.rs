@@ -1,6 +1,7 @@
 use rand::{seq::SliceRandom, thread_rng, Rng};
 
-const DEFAULT_LENGTH: std::ops::Range<usize> = 12..17;
+pub const DEFAULT_MIN: usize = 12;
+const DEFAULT_MAX: usize = 16;
 
 const UPPERCASE: &str = "ABCDEFGHIJKLMNOPQRSTUVWXZ";
 const LOWERCASE: &str = "abcdefghijklmnopqrstuvwxyz";
@@ -15,17 +16,21 @@ pub struct PasswordGenerator {
 
 impl PasswordGenerator {
     pub fn new(
-        length: usize,
+        length: Option<usize>,
         min_uppercase: usize,
         min_lowercase: usize,
         min_digits: usize,
         min_special: usize,
     ) -> Result<Self, ()> {
-        if length < min_uppercase + min_lowercase + min_digits + min_special {
-            eprintln!(
-                "ERROR: length of password cannot be lower than minimum requirements: {}",
+        let length = length.unwrap_or(
+            if DEFAULT_MIN > min_uppercase + min_lowercase + min_digits + min_special {
+                thread_rng().gen_range(DEFAULT_MIN..DEFAULT_MAX)
+            } else {
                 min_uppercase + min_lowercase + min_digits + min_special
-            );
+            },
+        );
+        if length < min_uppercase + min_lowercase + min_digits + min_special {
+            eprintln!("ERROR: length of password cannot be lower than minimum requirements");
             return Err(());
         }
 
@@ -75,7 +80,7 @@ impl PasswordGenerator {
 }
 
 pub struct PasswordGeneratorBuilder {
-    length: usize,
+    length: Option<usize>,
     min_uppercase: usize,
     min_lowercase: usize,
     min_digits: usize,
@@ -85,8 +90,7 @@ pub struct PasswordGeneratorBuilder {
 impl PasswordGeneratorBuilder {
     pub fn new() -> Self {
         Self {
-            length: 0,
-
+            length: None,
             min_uppercase: 1,
             min_lowercase: 1,
             min_digits: 1,
@@ -95,7 +99,7 @@ impl PasswordGeneratorBuilder {
     }
 
     pub fn length(mut self, length: Option<usize>) -> Self {
-        self.length = length.unwrap_or(thread_rng().gen_range(DEFAULT_LENGTH));
+        self.length = length;
         self
     }
 

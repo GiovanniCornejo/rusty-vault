@@ -32,7 +32,16 @@ fn usage_generate(program: &str) {
 fn parse_count(arg: Option<String>, arg_type: &str) -> Result<usize, ()> {
     if let Some(arg) = arg {
         match arg.parse::<usize>() {
-            Ok(count) => Ok(count),
+            Ok(count) => {
+                if arg_type == "length" && count < DEFAULT_MIN {
+                    eprintln!("ERROR: length must be at least {DEFAULT_MIN}");
+                    return Err(());
+                } else if count < 1 {
+                    eprintln!("ERROR: minimum count for {arg_type} must be at least 1");
+                    return Err(());
+                }
+                Ok(count)
+            }
             Err(_) => {
                 eprintln!("ERROR: invalid {arg_type} count: {arg}");
                 Err(())
