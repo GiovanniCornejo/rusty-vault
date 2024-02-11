@@ -97,6 +97,11 @@ impl PasswordGenerator {
             return -3;
         }
 
+        // Check password length before calculating entropy
+        if pw.len() < ALLOWED_MIN {
+            return -2;
+        }
+
         // Determine the size of the pool
         let mut pool = String::new();
         if pw.chars().any(|c| UPPERCASE.contains(c)) {
