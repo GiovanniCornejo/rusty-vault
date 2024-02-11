@@ -8,7 +8,7 @@ fn usage(program: &str) {
     eprintln!("Usage: {program} <SUBCOMMAND> [OPTIONS]");
     eprintln!("\nSubcommands");
     eprintln!("  generate                             generate a password");
-    eprintln!("  create                               create your own password");
+    eprintln!("  check                                check strength of a password");
     // Add more subcommands as needed
 
     eprintln!(
@@ -33,6 +33,7 @@ fn usage_generate(program: &str) {
 fn usage_check(program: &str) {
     eprintln!("Usage: {program} check <PASSWORD>");
     eprintln!("Check strength of a custom password");
+    eprintln!("NOTE: Calculates strength from entropy and does not recognize common passwords");
     eprintln!("\n  -h, --help                           show this help message and exit");
 }
 
@@ -111,19 +112,24 @@ fn entry() -> Result<(), ()> {
             println!("Generated password: {pw}");
         }
         "check" => {
-            if args.peek().is_none() {
-                usage_check(&program);
-                return Ok(());
+            let mut pw = match args.next() {
+                Some(s) => s,
+                None => {
+                    usage_check(&program);
+                    return Ok(());
+                }
+            };
+            while let Some(arg) = args.next() {
+                pw += &arg;
             }
-            // while let Some(arg) = args.next() {
-            //     match arg.as_str() {
-            //         _ => {
-            //             usage_check(&program);
-            //             eprintln!("ERROR: unknown argument {arg}");
-            //             return Err(());
-            //         }
-            //     }
-            // }
+
+            match PasswordGenerator::validate_password(&pw) {
+                2 => println!("Password strength: VERY STRONG"),
+                1 => println!("Password strength: STRONG"),
+                0 => println!("Password strength: MEDIUM"),
+                -1 => println!("Password strength: WEAK"),
+                _ => println!("Password strength: VERY WEAK"),
+            }
         }
         _ => {
             usage_generate(&program);

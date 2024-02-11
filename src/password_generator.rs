@@ -6,7 +6,7 @@ const DEFAULT_MAX: usize = 16;
 const UPPERCASE: &str = "ABCDEFGHIJKLMNOPQRSTUVWXZ";
 const LOWERCASE: &str = "abcdefghijklmnopqrstuvwxyz";
 const DIGITS: &str = "1234567890";
-const SPECIAL: &str = "!@#$%^&*_-()[]{}<>";
+const SPECIAL: &str = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ ";
 
 pub struct PasswordGenerator {
     length: usize,
@@ -79,13 +79,37 @@ impl PasswordGenerator {
         pw.iter().collect()
     }
 
-    /*  /// Validates a password based on common guidelines
-    /// Returns 1 if strong password
-    /// Returns 0 if medium password
-    /// Returns -1 if weak password
-    pub fn validate_password(pw: String) -> usize {
-        1
-    } */
+    /// Calculates password strength based on unique character pool size and password length
+    pub fn validate_password(pw: &str) -> i32 {
+        // Determine the size of the pool
+        let mut pool = String::new();
+        if pw.chars().any(|c| UPPERCASE.contains(c)) {
+            pool.push_str(UPPERCASE);
+        }
+        if pw.chars().any(|c| LOWERCASE.contains(c)) {
+            pool.push_str(LOWERCASE);
+        }
+        if pw.chars().any(|c| DIGITS.contains(c)) {
+            pool.push_str(DIGITS);
+        }
+        if pw.chars().any(|c| SPECIAL.contains(c)) {
+            pool.push_str(SPECIAL);
+        }
+        let pool_size = pool.chars().collect::<std::collections::HashSet<_>>().len();
+
+        // Determine password length
+        let pw_length = pw.chars().count();
+
+        // Calculate entropy
+        let entropy = (pw_length as f64 * (pool_size as f64).log2()) as usize;
+        match entropy {
+            128.. => 2, // Very strong
+            60.. => 1,  // Strong
+            36.. => 0,  // Medium
+            28.. => -1, // Weak
+            _ => -2,    // Very Weak
+        }
+    }
 }
 
 pub struct PasswordGeneratorBuilder {
