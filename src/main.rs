@@ -35,12 +35,12 @@ fn parse_count(arg: Option<String>, arg_type: &str) -> Result<usize, ()> {
             Ok(count) => Ok(count),
             Err(_) => {
                 eprintln!("ERROR: invalid {arg_type} count: {arg}");
-                return Err(());
+                Err(())
             }
         }
     } else {
         eprintln!("ERROR: no {arg_type} argument provided");
-        return Err(());
+        Err(())
     }
 }
 

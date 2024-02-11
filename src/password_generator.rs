@@ -29,11 +29,12 @@ impl PasswordGenerator {
             return Err(());
         }
 
-        let mut char_sets = Vec::new();
-        char_sets.push(UPPERCASE.chars().collect());
-        char_sets.push(LOWERCASE.chars().collect());
-        char_sets.push(DIGITS.chars().collect());
-        char_sets.push(SPECIAL.chars().collect());
+        let char_sets = vec![
+            UPPERCASE.chars().collect(),
+            LOWERCASE.chars().collect(),
+            DIGITS.chars().collect(),
+            SPECIAL.chars().collect(),
+        ];
 
         let min_counts = [min_uppercase, min_lowercase, min_digits, min_special];
 
