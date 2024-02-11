@@ -5,25 +5,46 @@ mod password_generator;
 use password_generator::*;
 
 fn usage(program: &str) {
+    eprintln!("Usage: {program} <SUBCOMMAND> [OPTIONS]");
+    eprintln!("\nSubcommands");
+    eprintln!("  generate                             generate a password ");
+    // Add more subcommands as needed
+
+    eprintln!(
+        "\nUse '{program} <SUBCOMMAND> --help' for more information on a specific subcommand"
+    );
+}
+
+fn usage_generate(program: &str) {
     eprintln!("Usage: {program} generate [OPTIONS]");
+    eprintln!("Generate a password");
     eprintln!("\nOptions:");
     eprintln!(
-        "    -l, --length <LENGTH>                specify the length of the generated password (default: 12-16)"
+        "  -l, --length <LENGTH>                length of the generated password (default: 12-16)"
     );
-    eprintln!("    -U, --no-uppercase                   exclude uppercase letters");
-    eprintln!("    -L, --no-lowercase                   exclude lowercase letters");
-    eprintln!("    -d, --no-digits                      exclude digits");
-    eprintln!("    -s, --no-special-chars               exclude special characters");
-    eprintln!("    -h, --help                           show this help message and exit");
+    eprintln!("  -u, --min-upper <COUNT>              minimum uppercase letters (default: 1)");
+    eprintln!("  -w, --min-lower <COUNT>              minimum lowercase letters (default: 1)");
+    eprintln!("  -d, --min-digits <COUNT>             minimum digits (default: 1)");
+    eprintln!("  -s, --min-special <COUNT>            minimum special chracters (default: 1)");
+    eprintln!("");
+    eprintln!("Exclusion Options:");
+    eprintln!("  -U, --no-uppercase                   exclude uppercase letters");
+    eprintln!("  -L, --no-lowercase                   exclude lowercase letters");
+    eprintln!("  -D, --no-digits                      exclude digits");
+    eprintln!("  -S, --no-special-chars               exclude special characters");
+    eprintln!("\n  -h, --help                           show this help message and exit");
 }
 
 fn entry() -> Result<(), ()> {
     let mut args = env::args();
     let program = args.next().expect("path to program is provided");
-    let subcommand = args.next().ok_or_else(|| {
-        usage(&program);
-        eprintln!("ERROR: no subcommand is provided");
-    })?;
+    let subcommand = match args.next() {
+        Some(subcommand) => subcommand,
+        None => {
+            usage(&program);
+            return Ok(());
+        }
+    };
 
     match subcommand.as_str() {
         "generate" => {
@@ -62,11 +83,11 @@ fn entry() -> Result<(), ()> {
                         special_chars = false;
                     }
                     "-h" | "--help" => {
-                        usage(&program);
+                        usage_generate(&program);
                         return Ok(());
                     }
                     _ => {
-                        usage(&program);
+                        usage_generate(&program);
                         eprintln!("ERROR: unknown argument {arg}");
                         return Err(());
                     }
@@ -85,7 +106,7 @@ fn entry() -> Result<(), ()> {
             Ok(())
         }
         _ => {
-            usage(&program);
+            usage_generate(&program);
             eprintln!("ERROR: unknown subcommand {}", subcommand);
             Err(())
         }
