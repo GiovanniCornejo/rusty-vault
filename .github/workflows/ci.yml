@@ -6,21 +6,24 @@ jobs:
     name: rusty-vault
     runs-on: ubuntu-latest
     steps:
-      # Check compiles
-      - uses: actions-rs/cargo@v1
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Compile
+        uses: actions-rs/cargo@v1
         with:
           command: build
           args: --release --all-features
-      # Check tests
-      - uses: actions-rs/cargo@v1
+      - name: Run tests
+        uses: actions-rs/cargo@v1
         with:
           command: test
-      # Check clippy remarks
-      - uses: actions-rs/cargo@v1
+      - name: Check clippy remarks
+        uses: actions-rs/cargo@v1
         with:
           command: clippy
-      # Check formatting
-      - uses: actions-rs/cargo@v1
+      - name: Check formatting
+        uses: actions-rs/cargo@v1
         with:
           command: fmt
           args: -- --check
