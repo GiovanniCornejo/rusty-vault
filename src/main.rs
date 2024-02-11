@@ -33,7 +33,9 @@ fn usage_generate(program: &str) {
 fn usage_check(program: &str) {
     eprintln!("Usage: {program} check <PASSWORD>");
     eprintln!("Check strength of a custom password");
-    eprintln!("NOTE: Calculates strength from entropy and does not recognize common passwords");
+    eprintln!(
+        "NOTE: Calculates entropic strength and recognizes most common passwords found in hacks/security breaches"
+    );
     eprintln!("\n  -h, --help                           show this help message and exit");
 }
 
@@ -123,12 +125,13 @@ fn entry() -> Result<(), ()> {
                 pw += &arg;
             }
 
-            match PasswordGenerator::validate_password(&pw) {
+            match PasswordGenerator::validate_password(&pw, &get_common_passwords()) {
                 2 => println!("Password strength: VERY STRONG"),
                 1 => println!("Password strength: STRONG"),
                 0 => println!("Password strength: MEDIUM"),
                 -1 => println!("Password strength: WEAK"),
-                _ => println!("Password strength: VERY WEAK"),
+                -2 => println!("Password strength: VERY WEAK"),
+                _ => println!("COMMON"),
             }
         }
         _ => {

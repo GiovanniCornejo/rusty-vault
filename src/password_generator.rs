@@ -1,3 +1,6 @@
+use std::fs::File;
+use std::io::{BufRead, BufReader};
+
 use rand::{seq::SliceRandom, thread_rng, Rng};
 
 pub const DEFAULT_MIN: usize = 13;
@@ -7,6 +10,17 @@ const UPPERCASE: &str = "ABCDEFGHIJKLMNOPQRSTUVWXZ";
 const LOWERCASE: &str = "abcdefghijklmnopqrstuvwxyz";
 const DIGITS: &str = "1234567890";
 const SPECIAL: &str = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ ";
+
+pub fn get_common_passwords() -> Vec<String> {
+    let file = File::open("data/10000-most-common-passwords.txt")
+        .expect("file not found: data/10000-most-common-passwords.txt");
+    let reader = BufReader::new(file);
+
+    reader
+        .lines()
+        .map(|line| line.expect("Failed to read line"))
+        .collect()
+}
 
 pub struct PasswordGenerator {
     length: usize,
@@ -80,7 +94,12 @@ impl PasswordGenerator {
     }
 
     /// Calculates password strength based on unique character pool size and password length
-    pub fn validate_password(pw: &str) -> i32 {
+    pub fn validate_password(pw: &str, common_passwords: &Vec<String>) -> i32 {
+        // Check if is a common password
+        if common_passwords.contains(&pw.to_string()) {
+            return -3;
+        }
+
         // Determine the size of the pool
         let mut pool = String::new();
         if pw.chars().any(|c| UPPERCASE.contains(c)) {
