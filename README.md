@@ -9,7 +9,7 @@ This section provides an overview of planned features, ongoing tasks, and future
 ### Current Tasks
 
 - [x] Set up project repository
-- [ ] Design data model for password entries
+- [x] Design data model for password entries
 - [ ] Choose encryption mechanism
 - [ ] Implement command-line interface (CLI)
 - [ ] Develop password encryption and storage functionality
@@ -29,6 +29,7 @@ This section provides an overview of planned features, ongoing tasks, and future
 - [ ] Add support for importing and exporting password data
 - [ ] Implement secure password sharing between trusted users
 - [ ] Explore options for multi-device synchronization and backup
+- [ ] Browser extension(s) to integrate with the program for automation
 
 ## Goal
 
