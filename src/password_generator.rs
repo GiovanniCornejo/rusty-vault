@@ -1,7 +1,6 @@
 use rand::{seq::SliceRandom, thread_rng, Rng};
 
-pub const ABSOLUTE_MIN: usize = 8;
-const DEFAULT_MIN: usize = 12;
+pub const DEFAULT_MIN: usize = 13;
 const DEFAULT_MAX: usize = 16;
 
 const UPPERCASE: &str = "ABCDEFGHIJKLMNOPQRSTUVWXZ";
@@ -30,8 +29,7 @@ impl PasswordGenerator {
                 min_uppercase + min_lowercase + min_digits + min_special
             },
         );
-        if length < ABSOLUTE_MIN
-            || length < min_uppercase + min_lowercase + min_digits + min_special
+        if length < DEFAULT_MIN || length < min_uppercase + min_lowercase + min_digits + min_special
         {
             eprintln!("ERROR: length of password not long enough");
             return Err(());
@@ -81,9 +79,13 @@ impl PasswordGenerator {
         pw.iter().collect()
     }
 
-    // pub fn validate_password(pw: String) -> bool {
-    //     true
-    // }
+    /*  /// Validates a password based on common guidelines
+    /// Returns 1 if strong password
+    /// Returns 0 if medium password
+    /// Returns -1 if weak password
+    pub fn validate_password(pw: String) -> usize {
+        1
+    } */
 }
 
 pub struct PasswordGeneratorBuilder {

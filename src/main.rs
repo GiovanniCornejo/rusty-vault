@@ -40,8 +40,8 @@ fn parse_count(arg: Option<String>, arg_type: &str) -> Result<usize, ()> {
     if let Some(arg) = arg {
         match arg.parse::<usize>() {
             Ok(count) => {
-                if arg_type == "length" && count < ABSOLUTE_MIN {
-                    eprintln!("ERROR: length must be at least {ABSOLUTE_MIN}");
+                if arg_type == "length" && count < DEFAULT_MIN {
+                    eprintln!("ERROR: length must be at least {DEFAULT_MIN}");
                     return Err(());
                 } else if count < 1 {
                     eprintln!("ERROR: minimum count for {arg_type} must be at least 1");
