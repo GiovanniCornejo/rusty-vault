@@ -1,12 +1,13 @@
 use rand::{seq::SliceRandom, thread_rng, Rng};
 
-pub const DEFAULT_MIN: usize = 12;
+pub const ABSOLUTE_MIN: usize = 8;
+const DEFAULT_MIN: usize = 12;
 const DEFAULT_MAX: usize = 16;
 
 const UPPERCASE: &str = "ABCDEFGHIJKLMNOPQRSTUVWXZ";
 const LOWERCASE: &str = "abcdefghijklmnopqrstuvwxyz";
 const DIGITS: &str = "1234567890";
-const SPECIAL: &str = "!@#$%^&*()";
+const SPECIAL: &str = "!@#$%^&*_-()[]{}<>";
 
 pub struct PasswordGenerator {
     length: usize,
@@ -29,7 +30,8 @@ impl PasswordGenerator {
                 min_uppercase + min_lowercase + min_digits + min_special
             },
         );
-        if length < DEFAULT_MIN || length < min_uppercase + min_lowercase + min_digits + min_special
+        if length < ABSOLUTE_MIN
+            || length < min_uppercase + min_lowercase + min_digits + min_special
         {
             eprintln!("ERROR: length of password not long enough");
             return Err(());
@@ -78,6 +80,10 @@ impl PasswordGenerator {
         pw.shuffle(&mut rng);
         pw.iter().collect()
     }
+
+    // pub fn validate_password(pw: String) -> bool {
+    //     true
+    // }
 }
 
 pub struct PasswordGeneratorBuilder {
@@ -135,6 +141,10 @@ impl PasswordGeneratorBuilder {
     }
 }
 
+/* -------------------------------------------------------------------------- */
+/*                                    TESTS                                   */
+/* -------------------------------------------------------------------------- */
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -142,11 +152,11 @@ mod tests {
     #[test]
     fn test_good_length() {
         let generator = PasswordGeneratorBuilder::new()
-            .length(Some(14))
+            .length(Some(10))
             .build()
             .unwrap();
         let password = generator.generate_password();
-        assert_eq!(password.len(), 14);
+        assert_eq!(password.len(), 10);
     }
 
     #[test]
@@ -196,20 +206,26 @@ mod tests {
     #[test]
     fn test_minimum_character_counts() {
         let generator = PasswordGeneratorBuilder::new()
-            .length(Some(50))
-            .min_uppercase(47)
+            .length(Some(100))
+            .min_uppercase(40)
+            .min_lowercase(20)
+            .min_digits(30)
+            .min_special(10)
             .build()
             .unwrap();
         let password = generator.generate_password();
         assert_eq!(
             password.chars().filter(|&c| c.is_ascii_uppercase()).count(),
-            47
+            40
         );
         assert_eq!(
             password.chars().filter(|&c| c.is_ascii_lowercase()).count(),
-            1
+            20
         );
-        assert_eq!(password.chars().filter(|&c| c.is_ascii_digit()).count(), 1);
-        assert_eq!(password.chars().filter(|&c| SPECIAL.contains(c)).count(), 1);
+        assert_eq!(password.chars().filter(|&c| c.is_ascii_digit()).count(), 30);
+        assert_eq!(
+            password.chars().filter(|&c| SPECIAL.contains(c)).count(),
+            10
+        );
     }
 }
