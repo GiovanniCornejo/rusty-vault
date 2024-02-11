@@ -29,8 +29,9 @@ impl PasswordGenerator {
                 min_uppercase + min_lowercase + min_digits + min_special
             },
         );
-        if length < min_uppercase + min_lowercase + min_digits + min_special {
-            eprintln!("ERROR: length of password cannot be lower than minimum requirements");
+        if length < DEFAULT_MIN || length < min_uppercase + min_lowercase + min_digits + min_special
+        {
+            eprintln!("ERROR: length of password not long enough");
             return Err(());
         }
 
@@ -131,5 +132,84 @@ impl PasswordGeneratorBuilder {
             self.min_digits,
             self.min_special,
         )
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_good_length() {
+        let generator = PasswordGeneratorBuilder::new()
+            .length(Some(14))
+            .build()
+            .unwrap();
+        let password = generator.generate_password();
+        assert_eq!(password.len(), 14);
+    }
+
+    #[test]
+    fn test_bad_length() {
+        // Test minimum length edge case
+        assert!(PasswordGeneratorBuilder::new()
+            .length(Some(1))
+            .build()
+            .is_err());
+    }
+
+    #[test]
+    fn test_inclusion_of_character_sets() {
+        // Test inclusion of uppercase characters
+        let generator = PasswordGeneratorBuilder::new()
+            .min_uppercase(1)
+            .build()
+            .unwrap();
+        let password = generator.generate_password();
+        assert!(password.chars().any(|c| c.is_ascii_uppercase()));
+
+        // Test inclusion of lowercase characters
+        let generator = PasswordGeneratorBuilder::new()
+            .min_lowercase(1)
+            .build()
+            .unwrap();
+        let password = generator.generate_password();
+        assert!(password.chars().any(|c| c.is_ascii_lowercase()));
+
+        // Test inclusion of digits
+        let generator = PasswordGeneratorBuilder::new()
+            .min_digits(1)
+            .build()
+            .unwrap();
+        let password = generator.generate_password();
+        assert!(password.chars().any(|c| c.is_ascii_digit()));
+
+        // Test inclusion of special characters
+        let generator = PasswordGeneratorBuilder::new()
+            .min_special(1)
+            .build()
+            .unwrap();
+        let password = generator.generate_password();
+        assert!(password.chars().any(|c| SPECIAL.contains(c)));
+    }
+
+    #[test]
+    fn test_minimum_character_counts() {
+        let generator = PasswordGeneratorBuilder::new()
+            .length(Some(50))
+            .min_uppercase(47)
+            .build()
+            .unwrap();
+        let password = generator.generate_password();
+        assert_eq!(
+            password.chars().filter(|&c| c.is_ascii_uppercase()).count(),
+            47
+        );
+        assert_eq!(
+            password.chars().filter(|&c| c.is_ascii_lowercase()).count(),
+            1
+        );
+        assert_eq!(password.chars().filter(|&c| c.is_ascii_digit()).count(), 1);
+        assert_eq!(password.chars().filter(|&c| SPECIAL.contains(c)).count(), 1);
     }
 }
