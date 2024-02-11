@@ -13,10 +13,11 @@ The password generation module focuses on generating strong, random passwords ac
 #### Current Tasks
 
 - [x] Set up project repository
-- [ ] Implement password generation mechanism
+- [x] Implement password generation mechanism
+- [x] Develop command-line interface (CLI) interaction for password generation
+- [ ] Develop advanced password generation options such as minimimum requirements
+- [ ] Design user interface for advanced password generation options
 - [ ] Write tests for password generation logic
-- [ ] Design user interface for specifying password generation options
-- [ ] Develop command-line interface (CLI) interaction for password generation
 - [ ] Test and validate password generation functionality
 - [ ] Document password generation usage and options
 
@@ -24,7 +25,6 @@ The password generation module focuses on generating strong, random passwords ac
 
 - [ ] Add configuration file for customization of default password generation options
 - [ ] Implement password strength analysis for user-created passwords
-- [ ] Enhance password generation algorithm for improved randomness and security
 
 ### Password Management Module
 
