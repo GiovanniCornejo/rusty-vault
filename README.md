@@ -69,6 +69,16 @@ You can customize the generated password by specifying various options such as p
 $ ./program generate --length 16 -min-upper 5
 ```
 
+### Checking Password Strength
+
+To check the strength of a password, use the check subcommand followed by the password. This command measures the password's strength based on various criteria.
+
+```shell
+$ ./program check MyStrongPassword123!
+```
+
+**Important Note**: The strength measurement by the check subcommand is an indication of how difficult it would be for a computer to crack the password using automated methods. However, password security involves considerations beyond automated cracking. The above "password" according to [security.org](https://www.security.org/how-secure-is-my-password/) would take a computer 42 quintillion years to crack, but can still be susceptible to human-based attacks leveraging common sense or social engineering techniques.
+
 ## Goal
 
 RustyVault is a project aimed at expanding my skills in Rust programming and exploring best practices in encryption and decryption. While the primary goal is to create a secure command-line password manager, the project also serves as a learning opportunity for me to deepen my understanding of Rust and cryptography.
