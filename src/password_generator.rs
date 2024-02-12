@@ -110,15 +110,15 @@ impl PasswordGenerator {
         pw.iter().collect()
     }
 
-    pub fn validate_password(pw: &str) -> i32 {
+    pub fn validate_password(pw: &str, allow_short: bool) -> i32 {
+        // Check for allowable password length
+        if !allow_short && pw.len() < ALLOWED_MIN {
+            return -2;
+        }
+
         // Check if is a common password
         if COMMON_PASSWORDS.contains(&pw) {
             return -3;
-        }
-
-        // Check password length before calculating entropy
-        if pw.len() < ALLOWED_MIN {
-            return -2;
         }
 
         // Determine the size of the pool and variety of characters
@@ -164,10 +164,16 @@ impl PasswordGenerator {
             strength -= 1;
         }
 
+        // Check smaller lengths
+        if pw.len() <= 8 {
+            strength -= 4;
+        } else if pw.len() <= 10 {
+            strength -= 3;
+        } else if pw.len() <= 13 {
+            strength -= 2;
+        }
+
         // Clamp strength to [-2, 2]
-        eprintln!(
-                "Strength: {strength}\nEntropy: {entropy}\nRepeats: {has_repeating_pattern}\nLength: {length}", length = pw.len()
-            );
         strength.clamp(-2, 2)
     }
 }
