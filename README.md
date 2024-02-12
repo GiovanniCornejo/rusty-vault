@@ -17,14 +17,13 @@ The password generation module focuses on generating strong, random passwords ac
 - [x] Develop command-line interface (CLI) interaction for password generation
 - [x] Develop advanced password generation options such as minimimum requirements
 - [x] Design user interface for advanced password generation options
-- [ ] Write tests for password generation logic
-- [ ] Test and validate password generation functionality
-- [ ] Document password generation usage and options
+- [x] Write tests for password generation logic
+- [x] Test and validate password generation functionality
+- [x] Document password generation usage and options
 
 #### Planned Features
 
-- [ ] Add configuration file for customization of default password generation options
-- [ ] Implement password strength analysis for user-created passwords
+- [x] Implement password strength analysis for user-created passwords
 
 ### Password Management Module
 
@@ -47,10 +46,28 @@ The password management module focuses on securely storing and managing password
 
 ### Future Enhancements
 
+- [ ] _Dubious_: Add a force allow feature that allows weaker user generated passwords
+- [ ] Add configuration file for customization of default password generation options
 - [ ] Integrate password generation module with password management for automatic password generation
 - [ ] Implement support for multi-device synchronization and backup
 - [ ] Develop browser extension(s) to automate password insertion into web forms
 - [ ] Enhance usability with interactive prompts and user-friendly messaging
+
+## Usage
+
+### Generating a Password
+
+To generate a password, use the `generate` subcommand. The default length is 20-25 and the minimum allowed lenth is 13. Both the default and minimum count for each character set is 1.
+
+```shell
+$ ./program generate
+```
+
+You can customize the generated password by specifying various options such as password length and the minimum number of each character set.
+
+```shell
+$ ./program generate --length 16 -min-upper 5
+```
 
 ## Goal
 
@@ -63,3 +80,7 @@ Contributions to RustyVault are currently not accepted as this project is primar
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
+
+```
+
+```
