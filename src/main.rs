@@ -32,10 +32,7 @@ fn usage_generate(program: &str) {
 
 fn usage_check(program: &str) {
     eprintln!("Usage: {program} check <PASSWORD>");
-    eprintln!("Check strength of a custom password");
-    eprintln!(
-        "NOTE: Calculates entropic strength and recognizes most common passwords found in hacks/security breaches"
-    );
+    eprintln!("Measure a password's strength by checking its entropy, length, character variety, repeating patterns, and most common passwords");
     eprintln!("\n  -h, --help                           show this help message and exit");
 }
 

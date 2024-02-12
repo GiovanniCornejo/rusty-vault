@@ -19,6 +19,27 @@ lazy_static! {
     };
 }
 
+/// Check for repeating substring patterns in a string
+fn has_repeated_pattern(s: &str) -> bool {
+    // Iterate through half of string
+    for start_index in 0..s.len() / 2 {
+        // Get the substring from the current starting index
+        let remaining = &s[start_index..];
+        let remaining_len = remaining.len();
+
+        // Iterate through substrings up to half of remaining list
+        for sub_len in 1..=remaining_len / 2 {
+            // Form a pattern by repeating the first sub_len characters of the remaining substring
+            let pattern = &remaining[..sub_len].repeat(remaining_len / sub_len);
+            if pattern == remaining {
+                return true;
+            }
+        }
+    }
+
+    false
+}
+
 pub struct PasswordGenerator {
     length: usize,
     char_sets: Vec<Vec<char>>,
@@ -102,34 +123,54 @@ impl PasswordGenerator {
             return -2;
         }
 
-        // Determine the size of the pool
+        // Determine the size of the pool and variety of characters
+        let mut character_variety = 0;
         let mut pool = String::new();
         if pw.chars().any(|c| UPPERCASE.contains(c)) {
+            character_variety += 1;
             pool.push_str(UPPERCASE);
         }
         if pw.chars().any(|c| LOWERCASE.contains(c)) {
+            character_variety += 1;
             pool.push_str(LOWERCASE);
         }
         if pw.chars().any(|c| DIGITS.contains(c)) {
+            character_variety += 1;
             pool.push_str(DIGITS);
         }
         if pw.chars().any(|c| SPECIAL.contains(c)) {
+            character_variety += 1;
             pool.push_str(SPECIAL);
         }
         let pool_size = pool.chars().collect::<std::collections::HashSet<_>>().len();
 
-        // Determine password length
-        let pw_length = pw.chars().count();
-
         // Calculate entropy
-        let entropy = (pw_length as f64 * (pool_size as f64).log2()) as usize;
-        match entropy {
-            128.. => 2, // Very strong
-            60.. => 1,  // Strong
-            36.. => 0,  // Medium
-            28.. => -1, // Weak
-            _ => -2,    // Very Weak
+        let entropy = (pw.len() as f64 * (pool_size as f64).log2()) as i32;
+        let mut strength = match entropy {
+            e if e > 128 => 3, // Very strong
+            e if e > 60 => 1,  // Strong
+            e if e > 36 => 0,  // Medium
+            e if e > 28 => -2, // Weak
+            _ => -3,           // Very Weak
+        };
+
+        strength = match character_variety {
+            4 => strength + 2,
+            2 => strength + 1,
+            _ => strength - 1,
+        };
+
+        // Check repeating patterns
+        let has_repeating_pattern = has_repeated_pattern(pw);
+        if has_repeating_pattern {
+            strength -= 1;
         }
+
+        // Clamp strength to [-2, 2]
+        eprintln!(
+                "Strength: {strength}\nEntropy: {entropy}\nRepeats: {has_repeating_pattern}\nLength: {length}", length = pw.len()
+            );
+        strength.clamp(-2, 2)
     }
 }
 
