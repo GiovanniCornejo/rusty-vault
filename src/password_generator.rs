@@ -111,7 +111,6 @@ impl PasswordGenerator {
         pw.iter().collect()
     }
 
-    /// Calculates password strength based on unique character pool size and password length
     pub fn validate_password(pw: &str, check_common: bool) -> i32 {
         // Check if is a common password
         if check_common && COMMON_PASSWORDS.contains(&pw) {
@@ -315,5 +314,17 @@ mod tests {
             password.chars().filter(|&c| SPECIAL.contains(c)).count(),
             10
         );
+    }
+
+    #[test]
+    fn test_repeats_in_passwords() {
+        assert!(has_repeated_pattern(
+            "thishasrepeatingpasswordthishasrepeatingpassword"
+        ));
+        assert!(!has_repeated_pattern("thishasnorepeats"));
+        assert!(has_repeated_pattern("onetwoonetwo"));
+        assert!(!has_repeated_pattern("onetwoone"));
+        assert!(!has_repeated_pattern("racecar"));
+        assert!(!has_repeated_pattern("wr#rpt#nononononopre"));
     }
 }
