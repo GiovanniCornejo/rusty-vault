@@ -61,7 +61,7 @@ fn parse_count(arg: Option<String>, arg_type: &str) -> Result<usize, ()> {
 }
 
 fn entry() -> Result<(), ()> {
-    let mut args = env::args().peekable();
+    let mut args = env::args();
     let program = args.next().expect("path to program is provided");
     let subcommand = match args.next() {
         Some(subcommand) => subcommand,
