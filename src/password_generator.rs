@@ -111,9 +111,9 @@ impl PasswordGenerator {
         pw.iter().collect()
     }
 
-    pub fn validate_password(pw: &str, check_common: bool) -> i32 {
+    pub fn validate_password(pw: &str) -> i32 {
         // Check if is a common password
-        if check_common && COMMON_PASSWORDS.contains(&pw) {
+        if COMMON_PASSWORDS.contains(&pw) {
             return -3;
         }
 

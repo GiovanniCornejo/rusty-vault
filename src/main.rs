@@ -122,7 +122,7 @@ fn entry() -> Result<(), ()> {
                 pw += &arg;
             }
 
-            match PasswordGenerator::validate_password(&pw, true) {
+            match PasswordGenerator::validate_password(&pw) {
                 2 => println!("Password strength: VERY STRONG"),
                 1 => println!("Password strength: STRONG"),
                 0 => println!("Password strength: MEDIUM"),
