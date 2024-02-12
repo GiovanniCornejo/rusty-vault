@@ -12,11 +12,10 @@ const SPECIAL: &str = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ ";
 
 // Store most common passwords directly into executable
 lazy_static! {
-    static ref COMMON_PASSWORDS: Vec<&'static str> = {
+    static ref COMMON_PASSWORDS: Vec<&'static str> =
         include_str!(r"../data/10000-most-common-passwords.txt")
-            .split_terminator('\n')
-            .collect()
-    };
+            .lines()
+            .collect();
 }
 
 /// Check for repeating substring patterns in a string
