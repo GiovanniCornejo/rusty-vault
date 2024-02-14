@@ -66,7 +66,7 @@ $ ./program generate
 You can customize the generated password by specifying various options such as password length and the minimum number of each character set.
 
 ```shell
-$ ./program generate --length 16 -min-upper 5
+$ ./program generate --length 16 --min-upper 5
 ```
 
 ### Checking Password Strength
@@ -77,7 +77,7 @@ To check the strength of a password, use the check subcommand followed by the pa
 $ ./program check MyStrongPassword123!
 ```
 
-**Important Note**: The strength measurement by the check subcommand is an indication of how difficult it would be for a computer to crack the password using automated methods. However, password security involves considerations beyond automated cracking. The above "password" according to [security.org](https://www.security.org/how-secure-is-my-password/) would take a computer 42 quintillion years to crack, but can still be susceptible to human-based attacks leveraging common sense or social engineering techniques.
+**Important Note**: The strength measurement by the check subcommand is an indication of how difficult it would be for a computer to crack the password using automated methods. However, password security involves considerations beyond automated cracking. For example, the above "password" according to [security.org](https://www.security.org/how-secure-is-my-password/) would take a computer 42 quintillion years to crack, but can still be susceptible to human-based attacks leveraging common sense or social engineering techniques.
 
 ## Goal
 
@@ -90,7 +90,3 @@ Contributions to RustyVault are currently not accepted as this project is primar
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
-
-```
-
-```
