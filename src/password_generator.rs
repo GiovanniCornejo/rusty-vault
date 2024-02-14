@@ -6,7 +6,7 @@ pub const DEFAULT_MIN: usize = 20;
 pub const DEFAULT_MAX: usize = 25;
 
 const UPPERCASE: &str = "ABCDEFGHIJKLMNOPQRSTUVWXZ";
-const LOWERCASE: &str = "abcdefghijklmnopqrstuvwxyz";
+const LOWERCASE: &str = "abcdefghijklmnopqrstuvwxz";
 const DIGITS: &str = "1234567890";
 const SPECIAL: &str = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ ";
 
@@ -39,47 +39,105 @@ fn has_repeated_pattern(s: &str) -> bool {
     false
 }
 
+struct CharSet {
+    chars: Vec<char>,
+    min_count: usize,
+}
+
 pub struct PasswordGenerator {
     length: usize,
-    char_sets: Vec<Vec<char>>,
-    min_counts: [usize; 4],
+    char_sets: Vec<CharSet>,
 }
 
 impl PasswordGenerator {
-    pub fn new(
-        length: Option<usize>,
-        min_uppercase: usize,
-        min_lowercase: usize,
-        min_digits: usize,
-        min_special: usize,
-    ) -> Result<Self, ()> {
-        let length = length.unwrap_or(
-            if DEFAULT_MIN > min_uppercase + min_lowercase + min_digits + min_special {
-                thread_rng().gen_range(DEFAULT_MIN..DEFAULT_MAX + 1)
-            } else {
-                min_uppercase + min_lowercase + min_digits + min_special
+    pub fn new() -> Self {
+        let length = thread_rng().gen_range(DEFAULT_MIN..DEFAULT_MAX + 1);
+
+        let char_sets = vec![
+            CharSet {
+                chars: UPPERCASE.chars().collect(),
+                min_count: 1,
             },
-        );
-        if length < ALLOWED_MIN || length < min_uppercase + min_lowercase + min_digits + min_special
-        {
-            eprintln!("ERROR: length of password not long enough");
+            CharSet {
+                chars: LOWERCASE.chars().collect(),
+                min_count: 1,
+            },
+            CharSet {
+                chars: DIGITS.chars().collect(),
+                min_count: 1,
+            },
+            CharSet {
+                chars: SPECIAL.chars().collect(),
+                min_count: 1,
+            },
+        ];
+
+        Self { length, char_sets }
+    }
+
+    pub fn length(&mut self, length: usize) -> Result<(), ()> {
+        if length < ALLOWED_MIN {
+            eprintln!("ERROR: length must be at least {ALLOWED_MIN}");
             return Err(());
         }
 
-        let char_sets = vec![
-            UPPERCASE.chars().collect(),
-            LOWERCASE.chars().collect(),
-            DIGITS.chars().collect(),
-            SPECIAL.chars().collect(),
-        ];
+        self.length = length;
+        Ok(())
+    }
 
-        let min_counts = [min_uppercase, min_lowercase, min_digits, min_special];
+    fn update_length(&mut self) {
+        let min = self.char_sets[0].min_count
+            + self.char_sets[1].min_count
+            + self.char_sets[2].min_count
+            + self.char_sets[3].min_count;
+        if self.length < min {
+            self.length = min;
+        }
+    }
 
-        Ok(Self {
-            length,
-            char_sets,
-            min_counts,
-        })
+    pub fn min_upper(&mut self, count: usize) -> Result<(), ()> {
+        if count < 1 {
+            eprintln!("ERROR: minimum uppercase must be at least 1");
+            return Err(());
+        }
+
+        self.char_sets[0].min_count = count;
+        self.update_length();
+        Ok(())
+    }
+
+    pub fn min_lower(&mut self, count: usize) -> Result<(), ()> {
+        if count < 1 {
+            eprintln!("ERROR: minimum lowercase must be at least 1");
+            return Err(());
+        }
+
+        self.char_sets[1].min_count = count;
+        self.update_length();
+        Ok(())
+    }
+
+    pub fn min_digits(&mut self, count: usize) -> Result<(), ()> {
+        if count < 1 {
+            eprintln!("ERROR: minimum digits must be at least 1");
+            return Err(());
+        }
+
+        self.char_sets[2].min_count = count;
+        self.update_length();
+        Ok(())
+    }
+
+    pub fn min_special(&mut self, count: usize) -> Result<(), ()> {
+        if count < 1 {
+            eprintln!("ERROR: minimum special characters must be at least 1");
+            return Err(());
+        }
+
+        self.char_sets[3].min_count = count;
+        self.update_length();
+
+        Ok(())
     }
 
     pub fn generate_password(&self) -> String {
@@ -91,9 +149,10 @@ impl PasswordGenerator {
 
         // Generate characters for each set until minimum requirements are met
         for (i, char_set) in self.char_sets.iter().enumerate() {
-            let required_count = self.min_counts[i].min(remaining_length);
+            let required_count = self.char_sets[i].min_count.min(remaining_length);
+
             for _ in 0..required_count {
-                pw.push(char_set[rng.gen_range(0..char_set.len())]);
+                pw.push(char_set.chars[rng.gen_range(0..char_set.chars.len())]);
                 remaining_length -= 1;
             }
         }
@@ -101,7 +160,8 @@ impl PasswordGenerator {
         // Generate remaining characters
         for _ in 0..remaining_length {
             let char_set = &self.char_sets[rng.gen_range(0..self.char_sets.len())];
-            pw.push(char_set[rng.gen_range(0..char_set.len())]);
+
+            pw.push(char_set.chars[rng.gen_range(0..char_set.chars.len())]);
         }
 
         // Shuffle the generated password
@@ -178,61 +238,6 @@ impl PasswordGenerator {
     }
 }
 
-pub struct PasswordGeneratorBuilder {
-    length: Option<usize>,
-    min_uppercase: usize,
-    min_lowercase: usize,
-    min_digits: usize,
-    min_special: usize,
-}
-
-impl PasswordGeneratorBuilder {
-    pub fn new() -> Self {
-        Self {
-            length: None,
-            min_uppercase: 1,
-            min_lowercase: 1,
-            min_digits: 1,
-            min_special: 1,
-        }
-    }
-
-    pub fn length(mut self, length: Option<usize>) -> Self {
-        self.length = length;
-        self
-    }
-
-    pub fn min_uppercase(mut self, count: usize) -> Self {
-        self.min_uppercase = count;
-        self
-    }
-
-    pub fn min_lowercase(mut self, count: usize) -> Self {
-        self.min_lowercase = count;
-        self
-    }
-
-    pub fn min_digits(mut self, count: usize) -> Self {
-        self.min_digits = count;
-        self
-    }
-
-    pub fn min_special(mut self, count: usize) -> Self {
-        self.min_special = count;
-        self
-    }
-
-    pub fn build(self) -> Result<PasswordGenerator, ()> {
-        PasswordGenerator::new(
-            self.length,
-            self.min_uppercase,
-            self.min_lowercase,
-            self.min_digits,
-            self.min_special,
-        )
-    }
-}
-
 /* -------------------------------------------------------------------------- */
 /*                                    TESTS                                   */
 /* -------------------------------------------------------------------------- */
@@ -243,82 +248,50 @@ mod tests {
 
     #[test]
     fn test_good_length() {
-        let generator = PasswordGeneratorBuilder::new()
-            .length(Some(14))
-            .build()
-            .unwrap();
-        let password = generator.generate_password();
-        assert_eq!(password.len(), 14);
+        let mut pg = PasswordGenerator::new();
+        pg.length(14).unwrap();
+        let pw = pg.generate_password();
+        assert_eq!(pw.len(), 14);
+
+        let mut pg = PasswordGenerator::new();
+        pg.length(14).unwrap();
+        let pw = pg.generate_password();
+        assert_eq!(pw.len(), 30);
     }
 
     #[test]
     fn test_bad_length() {
-        // Test minimum length edge case
-        assert!(PasswordGeneratorBuilder::new()
-            .length(Some(1))
-            .build()
-            .is_err());
+        let mut pg = PasswordGenerator::new();
+        assert!(pg.length(1).is_err());
+
+        let mut pg = PasswordGenerator::new();
+        assert!(pg.length(12).is_err());
     }
 
     #[test]
     fn test_inclusion_of_character_sets() {
-        // Test inclusion of uppercase characters
-        let generator = PasswordGeneratorBuilder::new()
-            .min_uppercase(1)
-            .build()
-            .unwrap();
-        let password = generator.generate_password();
-        assert!(password.chars().any(|c| c.is_ascii_uppercase()));
-
-        // Test inclusion of lowercase characters
-        let generator = PasswordGeneratorBuilder::new()
-            .min_lowercase(1)
-            .build()
-            .unwrap();
-        let password = generator.generate_password();
-        assert!(password.chars().any(|c| c.is_ascii_lowercase()));
-
-        // Test inclusion of digits
-        let generator = PasswordGeneratorBuilder::new()
-            .min_digits(1)
-            .build()
-            .unwrap();
-        let password = generator.generate_password();
-        assert!(password.chars().any(|c| c.is_ascii_digit()));
-
-        // Test inclusion of special characters
-        let generator = PasswordGeneratorBuilder::new()
-            .min_special(1)
-            .build()
-            .unwrap();
-        let password = generator.generate_password();
-        assert!(password.chars().any(|c| SPECIAL.contains(c)));
+        let pg = PasswordGenerator::new();
+        let pw = pg.generate_password();
+        assert!(pw.chars().any(|c| c.is_ascii_uppercase()));
+        assert!(pw.chars().any(|c| c.is_ascii_lowercase()));
+        assert!(pw.chars().any(|c| c.is_ascii_digit()));
+        assert!(pw.chars().any(|c| SPECIAL.contains(c)));
     }
 
     #[test]
     fn test_minimum_character_counts() {
-        let generator = PasswordGeneratorBuilder::new()
-            .length(Some(100))
-            .min_uppercase(40)
-            .min_lowercase(20)
-            .min_digits(30)
-            .min_special(10)
-            .build()
-            .unwrap();
-        let password = generator.generate_password();
-        assert_eq!(
-            password.chars().filter(|&c| c.is_ascii_uppercase()).count(),
-            40
-        );
-        assert_eq!(
-            password.chars().filter(|&c| c.is_ascii_lowercase()).count(),
-            20
-        );
-        assert_eq!(password.chars().filter(|&c| c.is_ascii_digit()).count(), 30);
-        assert_eq!(
-            password.chars().filter(|&c| SPECIAL.contains(c)).count(),
-            10
-        );
+        let mut pg = PasswordGenerator::new();
+        pg.length(100).unwrap();
+        pg.min_upper(40).unwrap();
+        pg.min_lower(20).unwrap();
+        pg.min_digits(30).unwrap();
+        pg.min_special(10).unwrap();
+
+        let pw = pg.generate_password();
+        assert_eq!(pw.chars().filter(|&c| c.is_ascii_uppercase()).count(), 40);
+        assert_eq!(pw.chars().filter(|&c| c.is_ascii_lowercase()).count(), 20);
+        assert_eq!(pw.chars().filter(|&c| c.is_ascii_digit()).count(), 30);
+        assert_eq!(pw.chars().filter(|&c| SPECIAL.contains(c)).count(), 10);
     }
 
     #[test]
