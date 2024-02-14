@@ -254,7 +254,7 @@ mod tests {
         assert_eq!(pw.len(), 14);
 
         let mut pg = PasswordGenerator::new();
-        pg.length(14).unwrap();
+        pg.length(30).unwrap();
         let pw = pg.generate_password();
         assert_eq!(pw.len(), 30);
     }
