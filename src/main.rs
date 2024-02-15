@@ -28,7 +28,8 @@ fn usage_generate(program: &str) {
     eprintln!("  -d, --min-digits <COUNT>             minimum digits (default: 1)");
     eprintln!("  -s, --min-special <COUNT>            minimum special characters (default: 1)");
     eprintln!("\n  -h, --help                           show this help message and exit");
-    eprintln!("\nNote: If the specified minimum counts exceed the specified length, the length will automatically be adjusted");
+    eprintln!("\nNote: If the specified minimum counts exceed the specified length,");
+    eprintln!("      the length will automatically be adjusted");
 }
 
 fn usage_check(program: &str) {
@@ -93,6 +94,10 @@ fn entry() -> Result<(), ()> {
         }
         "check" => {
             let mut pw = match args.next() {
+                Some(s) if s == "-h" || s == "--help" => {
+                    usage_check(&program);
+                    return Ok(());
+                }
                 Some(s) => s,
                 None => {
                     usage_check(&program);
