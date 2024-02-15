@@ -23,10 +23,14 @@ fn usage_generate(program: &str) {
     eprintln!(
         "  -n, --length <LENGTH>                length of the generated password (default: {DEFAULT_MIN}-{DEFAULT_MAX}, minimum: {ALLOWED_MIN})"
     );
-    eprintln!("  -u, --min-upper <COUNT>              minimum uppercase letters (default: 1)");
-    eprintln!("  -l, --min-lower <COUNT>              minimum lowercase letters (default: 1)");
-    eprintln!("  -d, --min-digits <COUNT>             minimum digits (default: 1)");
-    eprintln!("  -s, --min-special <COUNT>            minimum special characters (default: 1)");
+    eprintln!(
+        "  -u, --min-upper <COUNT>              minimum uppercase letters (default: 1, minimum: 1)"
+    );
+    eprintln!(
+        "  -l, --min-lower <COUNT>              minimum lowercase letters (default: 1, minimum: 1)"
+    );
+    eprintln!("  -d, --min-digits <COUNT>             minimum digits (default: 1, minimum: 1)");
+    eprintln!("  -s, --min-special <COUNT>            minimum special characters (default: 1, minimum: 1)");
     eprintln!("\n  -h, --help                           show this help message and exit");
     eprintln!("\nNote: If the specified minimum counts exceed the specified length,");
     eprintln!("      the length will automatically be adjusted");
@@ -114,7 +118,7 @@ fn entry() -> Result<(), ()> {
                 0 => println!("Password strength: MEDIUM"),
                 -1 => println!("Password strength: WEAK"),
                 -2 => println!("Password strength: VERY WEAK"),
-                _ => println!("COMMON"),
+                _ => println!("Password strength: COMMON"),
             }
         }
         _ => {
