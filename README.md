@@ -2,6 +2,8 @@
 
 RustyVault is a secure command-line password manager implemented in Rust. It provides users with the ability to generate strong, random passwords and securely store and retrieve password entries.
 
+### [Video Demo](https://youtu.be/qUlh5kjYNn8)
+
 ## Project Overview
 
 This project is divided into two main modules: password generation and password management.
@@ -52,6 +54,23 @@ The password management module focuses on securely storing and managing password
 - [ ] Implement support for multi-device synchronization and backup
 - [ ] Develop browser extension(s) to automate password insertion into web forms
 - [ ] Enhance usability with interactive prompts and user-friendly messaging
+
+## Steps to Setup
+
+1. **Download [Rust](https://www.rust-lang.org/tools/install)**
+
+1. **Clone the application**
+
+```bash
+$ git clone https://github.com/GiovanniCornejo/rusty-vault.git
+```
+
+1. **Build and run the app using cargo**
+
+```bash
+$ cargo build --release && cd target/release/
+$ ./rusty-vault
+```
 
 ## Usage
 
