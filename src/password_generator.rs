@@ -142,7 +142,7 @@ impl PasswordGenerator {
 
     pub fn generate_password(&self) -> String {
         let mut pw = String::new();
-        let mut rng = thread_rng();
+        let mut rng = thread_rng(); // CSPRNG
 
         // Keep track of minimum requirements
         let mut remaining_length = self.length;
